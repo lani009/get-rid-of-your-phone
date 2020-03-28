@@ -2,31 +2,38 @@ import socket
 import time
 import keyboard as key
 
+
+class enum:
+    pushed = 0
+    unpushed = 1
+
 def main():
     btnDet = button()
-    btnDet.stateSender()
-
-
+    btnDet.stateSender(socket)
 
 class button:
     originTime = None
     originState = None
     isOrigin = True
+    originData = 1
     alerted = False
-    originData=1
     def __init(self):
         pass
 
-    def stateSender(self):
-        self.originState = False
+    def stateSender(self, s):
+        self.originState = enum.unpushed
         while True:
             inputIO = key.is_pressed("k")
+            if(inputIO):
+                inputIO = 0
+            else:
+                inputIO = 1
             if(self.isOrigin and inputIO == self.originState):
                 self.originTime = time.time()
                 self.isOrigin = False
             elif(inputIO == self.originState):
                 if(self.isTimeover(self.originTime)):
-                    if(key.is_pressed("k") == False):
+                    if(inputIO):
                         data = 0
                     else:
                         data = 1
@@ -39,7 +46,7 @@ class button:
                         print(data)
                         self.alerted = True
             else:
-                self.originState = key.is_pressed("k")
+                self.originState = inputIO
                 self.isOrigin = True
 
             time.sleep(0.02)

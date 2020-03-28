@@ -12,7 +12,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 public class App {
     public static void main(String[] args) throws IOException, ParseException {
-        InfoReader infoReader = new InfoReader("D:/git/get-rid-of-your-phone/phonedetector/src/main/java/org/phonedetector/information.json");   //parse json information
+        InfoReader infoReader = new InfoReader("./information.json");   //parse json information
         ApiContextInitializer.init();
         //telegram bot init
         TelegramBotsApi botsApi = new TelegramBotsApi();

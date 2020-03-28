@@ -6,23 +6,26 @@ GPIO.setmode(GPIO.BCM)
 
 GPIO.setup(21, GPIO.IN)
 
+class enum:
+    pushed = 0
+    unpushed = 1
+
 def main():
     socket = javaSocket()
     btnDet = button()
     btnDet.stateSender(socket)
 
-if __name__ == "__main__":
-    main()
-
 class button:
     originTime = None
     originState = None
     isOrigin = True
+    originData = 1
+    alerted = False
     def __init(self):
         pass
 
     def stateSender(self, s):
-        self.originState = False
+        self.originState = enum.unpushed
         while True:
             inputIO = GPIO.input(21)
             if(self.isOrigin and inputIO == self.originState):
@@ -30,7 +33,7 @@ class button:
                 self.isOrigin = False
             elif(inputIO == self.originState):
                 if(self.isTimeover(self.originTime)):
-                    if(GPIO.input(21) == False):
+                    if(inputIO):
                         data = 0
                     else:
                         data = 1
@@ -41,10 +44,9 @@ class button:
 
                     if(not self.alerted):
                         print(data)
-                        s.sendState(data)
                         self.alerted = True
             else:
-                self.originState = GPIO.input(21)
+                self.originState = inputIO
                 self.isOrigin = True
 
             time.sleep(0.02)
@@ -66,3 +68,6 @@ class javaSocket:
         byte = bytearray()
         byte.append(data)
         self.s.send(byte)
+
+if __name__ == "__main__":
+    main()

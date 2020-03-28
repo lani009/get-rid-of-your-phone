@@ -4,8 +4,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
@@ -21,11 +21,11 @@ public class InfoReader {
 
     public InfoReader(String path) throws FileNotFoundException, IOException, ParseException {
         JSONParser parser = new JSONParser();
-        JSONObject jsonData = (JSONObject) parser.parse(new FileReader("./information.json"));
-        this.idArray = jsonData.getJSONArray("user");
-        this.apiToken = jsonData.getString("token");
-        this.botName = jsonData.getString("botName");
-        this.length = idArray.length();
+        JSONObject jsonData = (JSONObject) parser.parse(new FileReader(path));
+        this.idArray = (JSONArray) jsonData.get("user");
+        this.apiToken = (String) jsonData.get("token");
+        this.botName = (String) jsonData.get("botName");
+        this.length = idArray.size();
         this.cnt = 0;
     }
 
@@ -45,6 +45,9 @@ public class InfoReader {
     }
 
     public String nextId() {
-        return idArray.getJSONObject(cnt++).getString("id");
+        JSONObject data = (JSONObject) idArray.get(cnt++);
+        long id = (long) data.get("id");
+        String sId = Long.toString(id);
+        return sId;
     }
 }

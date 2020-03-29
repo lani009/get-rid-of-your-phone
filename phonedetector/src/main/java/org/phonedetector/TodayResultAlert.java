@@ -8,6 +8,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class TodayResultAlert implements Runnable {
     private MessageSender msgSender;
+    private MyBot bot;
     public TodayResultAlert() {
         msgSender = null;
     }
@@ -22,6 +23,11 @@ public class TodayResultAlert implements Runnable {
         return this;
     }
 
+    public TodayResultAlert setBot(MyBot bot) {
+        this.bot = bot;
+        return this;
+    }
+
     @Override
     public void run() {
         Calendar alertTime = Calendar.getInstance();
@@ -30,7 +36,8 @@ public class TodayResultAlert implements Runnable {
         
         while(true) {
             now.setTimeInMillis(System.currentTimeMillis());
-            if(now.get(Calendar.AM_PM) == 1 && now.get(Calendar.HOUR) > alertTime.get(Calendar.HOUR)) {
+
+            if(now.get(Calendar.AM_PM) == 1 && now.get(Calendar.HOUR) >= alertTime.get(Calendar.HOUR)) {
                 System.out.println("Alert Sending!");
                 alertSend();
                 sleep(7200000);
@@ -42,7 +49,7 @@ public class TodayResultAlert implements Runnable {
 
     private void sleep(int milli) {
         try {
-            Thread.sleep((long)milli);
+            Thread.sleep(new Long(milli));
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -63,32 +70,30 @@ public class TodayResultAlert implements Runnable {
         ResultReader result = new ResultReader();
         int cnt = 0;
         while(result.next() != -1) {
-            sb.append(cnt++);
+            sb.append(1 + (cnt++));
             sb.append(". ");
             sb.append("제출시간: ");
             sb.append(result.getStartTime());
-            sb.append("\n   회수시간: ");
+            sb.append("\n    회수시간: ");
             sb.append(result.getEndTime());
-            sb.append("\n   총 시간: ");
+            sb.append("\n    총 시간: ");
             sb.append(getMilliToFormat(result.getDuration()));
-            sb.append("\n");
+            sb.append("\n\n");
         }
         try {
-            msgSender.sendMessage(sb.toString());
+            bot.sendMessage(sb.toString());
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
         
     }
 
-    private String getMilliToFormat(int milli) {
+    private String getMilliToFormat(long milli) {
         long Hours = TimeUnit.MILLISECONDS.toHours(milli);
         long Minutes = TimeUnit.MILLISECONDS.toMinutes(milli);
         long Seconds = TimeUnit.MILLISECONDS.toSeconds(milli) - 
         TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(milli));
-        System.out.printf("hours: %d  min: %d  sec: %d", Hours, Minutes, Seconds);
         if(Hours == 0) {
-            System.out.println(String.format("%02d 분, %02d 초", Hours, Minutes, Seconds));
             return String.format("%02d 분, %02d 초",  Minutes, Seconds);
         }
         else {

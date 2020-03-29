@@ -49,7 +49,7 @@ public class PhoneThread implements Runnable {
                     lucy.setDoPhone(false);
                     lucy.clearReturnTime();
                     messageSender.sendMessage("폰을 반납했습니다!");
-                    System.out.println("폰을 반납함.");
+                    System.out.println("\n폰을 반납함.");
                 }
                 else if(intData == 0) {
                     return;
@@ -57,7 +57,6 @@ public class PhoneThread implements Runnable {
             } catch (IOException e) {
                 System.out.println(e.getMessage());
             }
-            System.out.println();
         }
     }
 }

@@ -12,6 +12,8 @@ public class MyBot extends TelegramLongPollingBot {
     private String botUsername;
     private String botToken;
     private Lucy lucy;
+    private String idArray[];
+    private int cnt = 0;
 
     @Override
     public void onUpdateReceived(Update update) {
@@ -48,7 +50,7 @@ public class MyBot extends TelegramLongPollingBot {
             }
         }
     }
-
+    
     @Override
     public String getBotUsername() {
         return botUsername;
@@ -72,6 +74,27 @@ public class MyBot extends TelegramLongPollingBot {
     public MyBot setLucy(Lucy lucy) {
         this.lucy = lucy;
         return this;
+    }
+
+    public void initIdArray(int len) {
+        idArray = new String[len];
+    }
+
+    public void setId(String id) {
+        idArray[cnt++] = id;
+    }
+
+    public void sendMessage(String text) {
+        for (int i = 0; i < idArray.length; i++) {
+            SendMessage message = new SendMessage()
+            .setChatId(idArray[i]).setText(text);
+    
+            try {
+                execute(message); // Call method to send the message
+            } catch (TelegramApiException e) {
+                e.getMessage();
+            }
+        }
     }
 
 }

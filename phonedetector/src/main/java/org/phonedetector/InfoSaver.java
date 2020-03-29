@@ -48,11 +48,8 @@ public class InfoSaver {
 
     public void saveData(long milli) throws IOException {
         File file = new File(path + "/" + getDate() + ".json");
-        System.out.println(file.getCanonicalPath());
-        System.out.println(file.getAbsolutePath());
         
         try {
-            System.out.println(file.exists());
             if(file.exists()) {
                 JSONParser parser = new JSONParser();
                 JSONObject jsonData = (JSONObject) parser.parse(new FileReader(file));

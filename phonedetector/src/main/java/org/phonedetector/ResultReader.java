@@ -1,12 +1,10 @@
 package org.phonedetector;
 
-import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.json.JSONArray;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
@@ -22,20 +20,21 @@ public class ResultReader {
     public ResultReader() {
         try {
             JSONParser parser = new JSONParser();
-            JSONObject jsonData = (JSONObject) parser.parse(new FileReader(path));
+            JSONObject jsonData = (JSONObject) parser.parse(new FileReader(getFileName()));
             this.dataArray = (JSONArray) jsonData.get("data");
         cnt = 0;
         } catch (Exception e) {
+            e.printStackTrace();
         }
         
     }
 
     public int getSize() {
-        return this.dataArray.length();
+        return this.dataArray.size();
     }
 
     public int next() {
-        if(dataArray.length() <= cnt) {
+        if(dataArray.size() <= cnt) {
             cnt = 0;
             return -1;
         }
@@ -51,8 +50,8 @@ public class ResultReader {
         return (String)timeData.get("tookTime");
     }
 
-    public int getDuration() {
-        return (int)timeData.get("duration");
+    public long getDuration() {
+        return (long)timeData.get("duration");
     }
 
     protected String getFileName() {

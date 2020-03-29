@@ -14,16 +14,34 @@ public class App {
     public static void main(String[] args) throws IOException, ParseException {
         InfoReader infoReader = new InfoReader("./information.json");   //parse json information
         
+        RpiSocket rpiConn = new RpiSocket(8887);    //RPISocket init
+        Lucy lucy = new Lucy();
+
         //messageSender init
         MessageSender messageSender = new MessageSender(infoReader.getLength())
                         .setApiToken(infoReader.getApiToken());
+
+        //telegram bot init
+        ApiContextInitializer.init();
+        TelegramBotsApi botsApi = new TelegramBotsApi();
+        MyBot bot = new MyBot()
+                    .setBotToken(infoReader.getApiToken())
+                    .setBotUsername(infoReader.getBotName())
+                    .setLucy(lucy);
+        try {
+            botsApi.registerBot(bot);
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
+        bot.initIdArray(infoReader.getLength());
         //id input
         for (int i = 0; i < infoReader.getLength(); i++) {
-            messageSender.setId(infoReader.nextId());
+            String id = infoReader.nextId();
+            messageSender.setId(id);
+            bot.setId(id);
         }
 
-        RpiSocket rpiConn = new RpiSocket(8887);    //RPISocket init
-        Lucy lucy = new Lucy();
+        
         PhoneThread pt = new PhoneThread()
                             .setLucy(lucy)
                             .setMessageSender(messageSender)
@@ -31,25 +49,11 @@ public class App {
         Thread thread = new Thread(pt, "PhoneThread");
 
         TodayResultAlert todayResult = new TodayResultAlert()
-                        .setMessageSender(messageSender);
+                        .setMessageSender(messageSender)
+                        .setBot(bot);
         Thread resultThread = new Thread(todayResult, "todayResultAlert");
         thread.start();
         resultThread.start();
-
-     
-        ApiContextInitializer.init();
-        //telegram bot init
-        TelegramBotsApi botsApi = new TelegramBotsApi();
-
-        try {
-            botsApi.registerBot(new MyBot()
-                            .setBotToken(infoReader.getApiToken())
-                            .setBotUsername(infoReader.getBotName())
-                            .setLucy(lucy)
-                            );
-        } catch (TelegramApiException e) {
-            e.printStackTrace();
-        }
     }
 }
 

@@ -9,8 +9,9 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
  * Telegram으로 전송받은 User Command를 처리
  */
 public class MyBot extends TelegramLongPollingBot {
-    String botUsername;
-    String botToken;
+    private String botUsername;
+    private String botToken;
+    private Lucy lucy;
 
     @Override
     public void onUpdateReceived(Update update) {
@@ -18,9 +19,16 @@ public class MyBot extends TelegramLongPollingBot {
         if (update.hasMessage() && update.getMessage().hasText()) {
             String messageText = update.getMessage().getText();
             System.out.println(update.getMessage().getChatId());
+            String text = "없는 명령어 입니다.";
             switch (messageText) {
-                case "/시간":
-                System.out.println("시간");
+                case "시간":
+                if(lucy.getDoPhone()) {
+                    text = "아직 공부를 시작하지 않았습니다!";
+                    break;
+                }
+                else {
+                    text = lucy.getFormattedReturnTimeDelta();
+                }
                     break;
                 
                 case "/폰":
@@ -31,11 +39,12 @@ public class MyBot extends TelegramLongPollingBot {
                     break;
             }
             SendMessage message = new SendMessage() // Create a SendMessage object with mandatory fields
-                    .setChatId(update.getMessage().getChatId()).setText(update.getMessage().getText());
+                    .setChatId(update.getMessage().getChatId()).setText(text);
+            
             try {
                 execute(message); // Call method to send the message
             } catch (TelegramApiException e) {
-                e.printStackTrace();
+                e.getMessage();
             }
         }
     }
@@ -57,6 +66,11 @@ public class MyBot extends TelegramLongPollingBot {
 
     public MyBot setBotToken(String botToken) {
         this.botToken = botToken;
+        return this;
+    }
+
+    public MyBot setLucy(Lucy lucy) {
+        this.lucy = lucy;
         return this;
     }
 

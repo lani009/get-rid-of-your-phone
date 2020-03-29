@@ -3,11 +3,13 @@ import time
 import keyboard as key
 
 
+
 class enum:
     pushed = 0
     unpushed = 1
 
 def main():
+    socket = javaSocket()
     btnDet = button()
     btnDet.stateSender(socket)
 
@@ -21,35 +23,9 @@ class button:
         pass
 
     def stateSender(self, s):
-        self.originState = enum.unpushed
         while True:
-            inputIO = key.is_pressed("k")
-            if(inputIO):
-                inputIO = 0
-            else:
-                inputIO = 1
-            if(self.isOrigin and inputIO == self.originState):
-                self.originTime = time.time()
-                self.isOrigin = False
-            elif(inputIO == self.originState):
-                if(self.isTimeover(self.originTime)):
-                    if(inputIO):
-                        data = 0
-                    else:
-                        data = 1
-
-                    if(self.originData != data):
-                        self.alerted = False
-                        self.originData = data
-
-                    if(not self.alerted):
-                        print(data)
-                        self.alerted = True
-            else:
-                self.originState = inputIO
-                self.isOrigin = True
-
-            time.sleep(0.02)
+            a = int(input())
+            s.sendState(a)
 
     def isTimeover(self, originTime):
         if(time.time() - originTime > 3.0):

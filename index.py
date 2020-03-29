@@ -34,9 +34,9 @@ class button:
             elif(inputIO == self.originState):
                 if(self.isTimeover(self.originTime)):
                     if(inputIO):
-                        data = 0
-                    else:
                         data = 1
+                    else:
+                        data = 2
 
                     if(self.originData != data):
                         self.alerted = False
@@ -44,6 +44,7 @@ class button:
 
                     if(not self.alerted):
                         print(data)
+                        s.sendState(data)
                         self.alerted = True
             else:
                 self.originState = inputIO

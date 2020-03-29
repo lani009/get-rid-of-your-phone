@@ -1,5 +1,6 @@
 package org.phonedetector;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.ServerSocket;
@@ -12,20 +13,10 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 public class App {
     public static void main(String[] args) throws IOException, ParseException {
+        File file = new File("./in");
+        System.out.println(file.getCanonicalPath());
         InfoReader infoReader = new InfoReader("./information.json");   //parse json information
-        ApiContextInitializer.init();
-        //telegram bot init
-        TelegramBotsApi botsApi = new TelegramBotsApi();
-
-        try {
-            botsApi.registerBot(new MyBot()
-                            .setBotToken(infoReader.getApiToken())
-                            .setBotUsername(infoReader.getBotName())
-                            );
-        } catch (TelegramApiException e) {
-            e.printStackTrace();
-        }
-
+        
         MessageSender messageSender = new MessageSender(infoReader.getLength())
                         .setApiToken(infoReader.getApiToken());
         
@@ -42,7 +33,20 @@ public class App {
         Thread thread = new Thread(pt, "PhoneThread");
         thread.start();
 
-        
+     
+        ApiContextInitializer.init();
+        //telegram bot init
+        TelegramBotsApi botsApi = new TelegramBotsApi();
+
+        try {
+            botsApi.registerBot(new MyBot()
+                            .setBotToken(infoReader.getApiToken())
+                            .setBotUsername(infoReader.getBotName())
+                            .setLucy(lucy)
+                            );
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
     }
 }
 
@@ -60,7 +64,7 @@ class RpiSocket {
         InputStream data = c_socket.getInputStream();
         byte[] receiveBuffer = new byte[10];
         data.read(receiveBuffer);
-        System.out.println("get Data" + receiveBuffer);
+        System.out.println("get Data" + receiveBuffer[0]);
         return receiveBuffer;
     }
 }

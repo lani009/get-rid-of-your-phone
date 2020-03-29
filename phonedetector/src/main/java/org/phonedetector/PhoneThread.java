@@ -33,25 +33,31 @@ public class PhoneThread implements Runnable {
 
     @Override
     public void run() {
+        InfoSaver infoSaver = new InfoSaver("./jsonData");
         while(true) {
             try {
                 byte[] byteData = socket.getData();
                 int intData = byteData[0];
-                System.out.println(intData);
-                //핸드폰 제출 안했을 때
-                if(intData == 0) {
-                    lucy.setDoPhone(false);
-                    messageSender.sendMessage(String.format("폰을 회수했습니다! 반납 유지 시간: %s", lucy.getFormattedReturnTimeDelta()));
-                }
-                else {
+                //핸드폰 회수함. 폰을 안하고 있던 상태여야함
+                if(intData == 1 && !lucy.getDoPhone()) {
                     lucy.setDoPhone(true);
+                    messageSender.sendMessage(String.format("폰을 회수했습니다! 반납 유지 시간: %s", lucy.getFormattedReturnTimeDelta()));
+                    infoSaver.saveData(lucy.getReturnTimeDelta());
+                    System.out.println("폰을 회수함.");
+                }
+                else if(intData == 2 && lucy.getDoPhone()) {
+                    lucy.setDoPhone(false);
                     lucy.clearReturnTime();
                     messageSender.sendMessage("폰을 반납했습니다!");
+                    System.out.println("폰을 반납함.");
+                }
+                else if(intData == 0) {
+                    return;
                 }
             } catch (IOException e) {
                 System.out.println(e.getMessage());
-                if(e.getMessage().equals("Connection reset")) { break; }
             }
+            System.out.println();
         }
     }
 
@@ -80,11 +86,11 @@ public class PhoneThread implements Runnable {
  * 동생 영어이름이 Lucy이다.
  */
 class Lucy {
-    private boolean returnPhone;    //폰을 제출 하였나? True->제출함.
+    private boolean doPhone;   
     private long returnTime;    //폰을 제출 한 시간.
 
     public Lucy() {
-        this.returnPhone = false;
+        this.doPhone = true;    //폰을 하고 있던 것으로 가정
     }
 
     /**
@@ -92,7 +98,7 @@ class Lucy {
      * @param state, 제출하였으면 True
      */
     public void setDoPhone(boolean state) {
-        returnPhone = state;
+        doPhone = state;
     }
 
     public void clearReturnTime() {
@@ -103,19 +109,31 @@ class Lucy {
      * 동생이 폰을 하고 있는지 안하고 있는지 체크
      * @return true if she hasen't returned her phone. As so reversal.
      */
-    public boolean getReturnPhone() {
-        return returnPhone;
+    public boolean getDoPhone() {
+        return doPhone;
     }
 
     protected long getReturnTimeDelta() {
         return System.currentTimeMillis() - returnTime;
     }
 
+    /**
+     * 폰을 반납한 시간과 현재 시간의 차이를 리턴
+     * 즉, 핸드폰 제출한 시간의 Duration을 리턴한다.
+     * @return TimeDelta
+     */
     public String getFormattedReturnTimeDelta() {
-        return String.format("%02d 분, %02d 초", 
-        TimeUnit.MILLISECONDS.toMinutes(getReturnTimeDelta()),
-        TimeUnit.MILLISECONDS.toSeconds(getReturnTimeDelta()) - 
-        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(getReturnTimeDelta()))
-    );
+        long Hours = TimeUnit.MILLISECONDS.toHours(getReturnTimeDelta());
+        long Minutes = TimeUnit.MILLISECONDS.toMinutes(getReturnTimeDelta());
+        long Seconds = TimeUnit.MILLISECONDS.toSeconds(getReturnTimeDelta()) - 
+        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(getReturnTimeDelta()));
+        System.out.printf("hours: %d  min: %d  sec: %d", Hours, Minutes, Seconds);
+        if(Hours == 0) {
+            System.out.println(String.format("%02d 분, %02d 초", Hours, Minutes, Seconds));
+            return String.format("%02d 분, %02d 초",  Minutes, Seconds);
+        }
+        else {
+            return String.format("%02d 시간, %02d 분, %02d 초", Hours, Minutes, Seconds);
+        }
     }
 }

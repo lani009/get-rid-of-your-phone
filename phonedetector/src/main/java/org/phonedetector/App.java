@@ -1,6 +1,5 @@
 package org.phonedetector;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.ServerSocket;
@@ -13,13 +12,12 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 public class App {
     public static void main(String[] args) throws IOException, ParseException {
-        File file = new File("./in");
-        System.out.println(file.getCanonicalPath());
         InfoReader infoReader = new InfoReader("./information.json");   //parse json information
         
+        //messageSender init
         MessageSender messageSender = new MessageSender(infoReader.getLength())
                         .setApiToken(infoReader.getApiToken());
-        
+        //id input
         for (int i = 0; i < infoReader.getLength(); i++) {
             messageSender.setId(infoReader.nextId());
         }
@@ -31,7 +29,12 @@ public class App {
                             .setMessageSender(messageSender)
                             .setSocket(rpiConn);
         Thread thread = new Thread(pt, "PhoneThread");
+
+        TodayResultAlert todayResult = new TodayResultAlert()
+                        .setMessageSender(messageSender);
+        Thread resultThread = new Thread(todayResult, "todayResultAlert");
         thread.start();
+        resultThread.start();
 
      
         ApiContextInitializer.init();

@@ -60,23 +60,6 @@ public class PhoneThread implements Runnable {
             System.out.println();
         }
     }
-
-    // private int byteArrayToInt(byte[] bytes) {
-    //     final int size = Integer.SIZE / 8;
-    //     final byte[] newBytes = new byte[size];
-    //     for (int i = 0; i < size; i++) {
-    //             if(i + bytes.length < size) {
-    //                 newBytes[i] = (byte) 0x00;
-    //             }
-    //             else {
-    //                 newBytes[i] = bytes[i + bytes.length - size];
-    //             }
-    //     }
-    //     ByteBuffer buff = ByteBuffer.wrap(newBytes);
-    //     buff.order(ByteOrder.BIG_ENDIAN);
-    //     return buff.getInt();
-    // }
-
 }
 
 /**
@@ -95,7 +78,7 @@ class Lucy {
 
     /**
      * set if she has phone.
-     * @param state, 제출하였으면 True
+     * @param state, 제출하였으면 False
      */
     public void setDoPhone(boolean state) {
         doPhone = state;
@@ -107,6 +90,7 @@ class Lucy {
 
     /**
      * 동생이 폰을 하고 있는지 안하고 있는지 체크
+     * 만약 폰을 제출 하지 않았다(폰을 하고 있다) -> return true
      * @return true if she hasen't returned her phone. As so reversal.
      */
     public boolean getDoPhone() {

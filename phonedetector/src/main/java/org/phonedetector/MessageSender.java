@@ -11,26 +11,35 @@ import java.net.URLConnection;
 /**
  * Telegram으로 메시지를 전송하기 위한 클래스
  * MessageSender ms = new MesageSender()
- *                      .setApiToken(apiToken);
+ *                      .setApiToken(apiToken)
+ *                      .setId(id);
  */
 public class MessageSender {
     private String idArray[];
-    private int cnt;
     private String urlString = "https://api.telegram.org/bot%s/sendMessage?chat_id=%s&text=%s";
     private String apiToken;
 
-    public MessageSender(int length) {
-        cnt = 0;
-        idArray = new String[length];
-    }
+    public MessageSender() { }
 
+    /**
+     * set Bot's unique token
+     * @param botToken
+     * @return self
+     */
     public MessageSender setApiToken(String apiToken) {
         this.apiToken = apiToken;
         return this;
     }
 
-    public void setId(String id) {
-        idArray[cnt++] = id;
+    public MessageSender setId(String id) {
+        idArray = new String[1];
+        idArray[0] = id;
+        return this;
+    }
+
+    public MessageSender setId(String[] id) {
+        idArray = id;
+        return this;
     }
 
     public void sendMessage(String text) throws IOException {

@@ -1,26 +1,13 @@
 package org.phonedetector;
 
 import java.util.Calendar;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Thread를 통해 오후 11시가 되면 하루 일과 총 정리를 보낸다.
  */
 public class TodayResultAlert implements Runnable {
-    private MessageSender msgSender;
     private MyBot bot;
     public TodayResultAlert() {
-        msgSender = null;
-    }
-
-    /**
-     * set MessageSender Instance
-     * @param msgsSender
-     * @return TodayResultAlert
-     */
-    public TodayResultAlert setMessageSender(MessageSender msgSender) {
-        this.msgSender = msgSender;
-        return this;
     }
 
     public TodayResultAlert setBot(MyBot bot) {
@@ -47,9 +34,13 @@ public class TodayResultAlert implements Runnable {
 
     }
 
-    private void sleep(int milli) {
+    /**
+     * Thread sleep
+     * @param milliSeconds to be sleeped
+     */
+    private void sleep(int milliSeconds) {
         try {
-            Thread.sleep(new Long(milli));
+            Thread.sleep(new Long(milliSeconds));
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -65,6 +56,7 @@ public class TodayResultAlert implements Runnable {
         2. 제출시간: 09:23:42
            회수시간: 10:24:01
            총 시간: 3시간 01분 35초
+        총 시간: 00시간 00분 00초
         */
         StringBuilder sb = new StringBuilder("오늘의 종합 보고\n");
         ResultReader result = new ResultReader();
@@ -81,30 +73,16 @@ public class TodayResultAlert implements Runnable {
             sb.append("\n    총 시간: ");
             duration = result.getDuration();
             durationTotal += duration;
-            sb.append(getMilliToFormat(duration));
+            sb.append(TimeCalculator.getMilliToFormatted(duration));
             sb.append("\n\n");
         }
         sb.append("오늘의 총 시간: ");
-        sb.append(getMilliToFormat(durationTotal));
+        sb.append(TimeCalculator.getMilliToFormatted(durationTotal));
         try {
             bot.sendMessage(sb.toString());
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
         
-    }
-
-    private String getMilliToFormat(long milli) {
-        long Hours = TimeUnit.MILLISECONDS.toHours(milli);
-        long Minutes = TimeUnit.MILLISECONDS.toMinutes(milli) - Hours * 60;
-        long Seconds = TimeUnit.MILLISECONDS.toSeconds(milli) - 
-        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(milli));
-
-        if(Hours == 0) {
-            return String.format("%02d 분, %02d 초",  Minutes, Seconds);
-        }
-        else {
-            return String.format("%02d 시간, %02d 분, %02d 초", Hours, Minutes, Seconds);
-        }
     }
 }

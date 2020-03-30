@@ -29,7 +29,7 @@ public class MyBot extends TelegramLongPollingBot {
                     break;
                 }
                 else {
-                    text = lucy.getFormattedReturnTimeDelta();
+                    text = TimeCalculator.getMilliToFormatted(lucy.getReturnTimeDelta());
                 }
                     break;
                 

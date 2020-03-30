@@ -50,4 +50,27 @@ public class InfoReader {
         String sId = Long.toString(id);
         return sId;
     }
+
+    /**
+     * clear the previuos nextId() iteration
+     */
+    public void clearIteration() {
+        cnt = 0;
+    }
+
+    /**
+     * returns the User Id in string array
+     * @return String[] id
+     */
+    public String[] getId() {
+        int tempCnt = cnt;  //to memorize the previous cnt value
+        cnt = 0;
+        String[] id = new String[length];
+        for (int i = 0; i < length; i++) {
+            JSONObject data = (JSONObject) idArray.get(cnt++);
+            id[i] = Long.toString((long)data.get("id"));
+        }
+        cnt = tempCnt;
+        return id;
+    }
 }

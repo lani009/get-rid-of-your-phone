@@ -1,8 +1,6 @@
 package org.phonedetector;
 
 import java.io.FileReader;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -55,8 +53,6 @@ public class ResultReader {
     }
 
     protected String getFileName() {
-        Date date = new Date();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        return path + "/" + dateFormat.format(date) + ".json";
+        return path + "/" + TimeCalculator.getTodayFormatted() + ".json";
     }
 }

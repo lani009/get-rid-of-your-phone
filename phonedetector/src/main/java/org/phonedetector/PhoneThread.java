@@ -1,7 +1,6 @@
 package org.phonedetector;
 
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 
 /**
  * socket으로 부터 데이터를 전송받을 때 마다 응답하기 위한 클래스
@@ -36,12 +35,11 @@ public class PhoneThread implements Runnable {
         InfoSaver infoSaver = new InfoSaver("./jsonData");
         while(true) {
             try {
-                byte[] byteData = socket.getData();
-                int intData = byteData[0];
+                int intData = socket.getIntData();
                 //핸드폰 회수함. 폰을 안하고 있던 상태여야함
                 if(intData == 1 && !lucy.getDoPhone()) {
                     lucy.setDoPhone(true);
-                    messageSender.sendMessage(String.format("폰을 회수했습니다! 반납 유지 시간: %s", lucy.getFormattedReturnTimeDelta()));
+                    messageSender.sendMessage(String.format("폰을 회수했습니다! 반납 유지 시간: %s", TimeCalculator.getMilliToFormatted(lucy.getReturnTimeDelta())));
                     infoSaver.saveData(lucy.getReturnTimeDelta());
                     System.out.println("\n폰을 회수함.");
                 }
@@ -98,26 +96,5 @@ class Lucy {
 
     protected long getReturnTimeDelta() {
         return System.currentTimeMillis() - returnTime;
-    }
-
-    /**
-     * 폰을 반납한 시간과 현재 시간의 차이를 리턴
-     * 즉, 핸드폰 제출한 시간의 Duration을 리턴한다.
-     * @return TimeDelta
-     */
-    public String getFormattedReturnTimeDelta() {
-        long Hours = TimeUnit.MILLISECONDS.toHours(getReturnTimeDelta());
-        long Minutes = TimeUnit.MILLISECONDS.toMinutes(getReturnTimeDelta()) -
-        Hours * 60;
-        long Seconds = TimeUnit.MILLISECONDS.toSeconds(getReturnTimeDelta()) - 
-        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(getReturnTimeDelta()));
-        System.out.printf("hours: %d  min: %d  sec: %d", Hours, Minutes, Seconds);
-        if(Hours == 0) {
-            System.out.println(String.format("%02d 분, %02d 초", Hours, Minutes, Seconds));
-            return String.format("%02d 분, %02d 초",  Minutes, Seconds);
-        }
-        else {
-            return String.format("%02d 시간, %02d 분, %02d 초", Hours, Minutes, Seconds);
-        }
     }
 }

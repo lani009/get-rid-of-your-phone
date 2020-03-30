@@ -18,6 +18,7 @@ public class InfoReader {
     private String apiToken;
     private String botName;
     private int cnt;
+    private String password;
 
     public InfoReader(String path) throws FileNotFoundException, IOException, ParseException {
         JSONParser parser = new JSONParser();
@@ -25,6 +26,7 @@ public class InfoReader {
         this.idArray = (JSONArray) jsonData.get("user");
         this.apiToken = (String) jsonData.get("token");
         this.botName = (String) jsonData.get("botName");
+        this.password = (String) jsonData.get("password");
         this.length = idArray.size();
         this.cnt = 0;
     }
@@ -42,6 +44,10 @@ public class InfoReader {
 
     public String getBotName() {
         return botName;
+    }
+
+    public String getPassword() {
+        return password;
     }
 
     public String nextId() {

@@ -9,7 +9,8 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 public class App {
     public static void main(String[] args) throws IOException, ParseException {
-        InfoReader infoReader = new InfoReader("./information.json");   //parse json information
+        String informationPath = "./information.json";
+        InfoReader infoReader = new InfoReader(informationPath);   //parse json information
         
         RpiSocket rpiConn = new RpiSocket(8887);    //RPISocket init
         Lucy lucy = new Lucy();
@@ -20,7 +21,9 @@ public class App {
         MyBot bot = new MyBot()
                     .setBotToken(infoReader.getApiToken())
                     .setBotUsername(infoReader.getBotName())
-                    .setLucy(lucy);
+                    .setLucy(lucy)
+                    .setPassword(infoReader.getPassword())
+                    .setInfoPath(informationPath);
         try {
             botsApi.registerBot(bot);
         } catch (TelegramApiException e) {

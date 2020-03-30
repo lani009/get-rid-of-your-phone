@@ -69,6 +69,8 @@ public class TodayResultAlert implements Runnable {
         StringBuilder sb = new StringBuilder("오늘의 종합 보고\n");
         ResultReader result = new ResultReader();
         int cnt = 0;
+        long durationTotal = 0;
+        long duration;
         while(result.next() != -1) {
             sb.append(1 + (cnt++));
             sb.append(". ");
@@ -77,9 +79,13 @@ public class TodayResultAlert implements Runnable {
             sb.append("\n    회수시간: ");
             sb.append(result.getEndTime());
             sb.append("\n    총 시간: ");
-            sb.append(getMilliToFormat(result.getDuration()));
+            duration = result.getDuration();
+            durationTotal += duration;
+            sb.append(getMilliToFormat(duration));
             sb.append("\n\n");
         }
+        sb.append("오늘의 총 시간: ");
+        sb.append(getMilliToFormat(durationTotal));
         try {
             bot.sendMessage(sb.toString());
         } catch (Exception e) {
@@ -90,9 +96,10 @@ public class TodayResultAlert implements Runnable {
 
     private String getMilliToFormat(long milli) {
         long Hours = TimeUnit.MILLISECONDS.toHours(milli);
-        long Minutes = TimeUnit.MILLISECONDS.toMinutes(milli);
+        long Minutes = TimeUnit.MILLISECONDS.toMinutes(milli) - Hours * 60;
         long Seconds = TimeUnit.MILLISECONDS.toSeconds(milli) - 
         TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(milli));
+
         if(Hours == 0) {
             return String.format("%02d 분, %02d 초",  Minutes, Seconds);
         }

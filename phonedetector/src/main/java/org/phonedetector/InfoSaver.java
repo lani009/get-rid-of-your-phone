@@ -46,6 +46,7 @@ public class InfoSaver {
         return dateFormat.format(new Date());
     }
 
+    @SuppressWarnings("unchecked")
     public void saveData(long milli) throws IOException {
         File file = new File(path + "/" + getDate() + ".json");
         

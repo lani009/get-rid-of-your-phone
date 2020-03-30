@@ -43,7 +43,7 @@ public class PhoneThread implements Runnable {
                     lucy.setDoPhone(true);
                     messageSender.sendMessage(String.format("폰을 회수했습니다! 반납 유지 시간: %s", lucy.getFormattedReturnTimeDelta()));
                     infoSaver.saveData(lucy.getReturnTimeDelta());
-                    System.out.println("폰을 회수함.");
+                    System.out.println("\n폰을 회수함.");
                 }
                 else if(intData == 2 && lucy.getDoPhone()) {
                     lucy.setDoPhone(false);

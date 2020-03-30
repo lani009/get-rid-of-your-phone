@@ -107,7 +107,8 @@ class Lucy {
      */
     public String getFormattedReturnTimeDelta() {
         long Hours = TimeUnit.MILLISECONDS.toHours(getReturnTimeDelta());
-        long Minutes = TimeUnit.MILLISECONDS.toMinutes(getReturnTimeDelta());
+        long Minutes = TimeUnit.MILLISECONDS.toMinutes(getReturnTimeDelta()) -
+        Hours * 60;
         long Seconds = TimeUnit.MILLISECONDS.toSeconds(getReturnTimeDelta()) - 
         TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(getReturnTimeDelta()));
         System.out.printf("hours: %d  min: %d  sec: %d", Hours, Minutes, Seconds);

@@ -1,5 +1,8 @@
 package org.phonedetector;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -23,21 +26,38 @@ public class MyBot extends TelegramLongPollingBot {
     public void onUpdateReceived(Update update) {
         // check if the update has a message and the message has text
         if (update.hasMessage() && update.getMessage().hasText()) {
-            String messageText = update.getMessage().getText();
+            final String TEXT = update.getMessage().getText();
+            final String ID = String.valueOf(update.getMessage().getChatId());
 
-            StringBuilder sb = new StringBuilder(Long.toString(update.getMessage().getChatId()));
+            StringBuilder sb = new StringBuilder(ID);
+            String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
             sb.append("의 메세지: ");
-            sb.append(update.getMessage().getText());
+            sb.append(TEXT);
             sb.append(" - ");
-            sb.append(update.getMessage().getDate());
+            sb.append(date);
 
+            boolean behavior = true;   //가입되지 않은 사용자 일 경우 true
+            for (int i = 0; i < idArray.length; i++) {
+                if(idArray[i].equals(ID)) { behavior = false; break; }
+            }
+            if(behavior) {
+                System.out.println("가입되지 않은 사용자");
+                privateSendMessage("가입되지 않은 사용자로부터 메시지\n" + TEXT, idArray[0]);
+
+                //가입하려는 목적이 아닐 경우
+                if(!TEXT.equals("가입")) {
+                    privateSendMessage("가입되지 않은 사용자 입니다.", ID);
+                    return; //가입되지 않은 사용자 일경우 리턴
+                }
+                
+            }
             System.out.println(sb.toString());
 
             if(member != 0) {
                 boolean register = false;
                 int index = -1;
                 for (int i = 0; i < member; i++) {
-                    if(registerState[i].equals(Long.toString(update.getMessage().getChatId()))) {
+                    if(registerState[i].equals(ID)) {
                         register = true;
                         index = i;
                         break;
@@ -45,14 +65,14 @@ public class MyBot extends TelegramLongPollingBot {
                 }
 
                 if(register) {
-                    if(password.equals(messageText)) {
+                    if(password.equals(TEXT)) {
                         RegisterUser ru = new RegisterUser(path);
-                        ru.savePassword(update.getMessage().getChatId());
-                        System.out.println("가입완료");
+                        ru.savePassword(Long.valueOf(ID));
+                        System.out.println(ID + " 가입완료");
                         return;
                     }
                     else {
-                        privateSendMessage("비밀번호가 틀립니다.", update.getMessage().getChatId());
+                        privateSendMessage("비밀번호가 틀립니다.", ID);
                         for (int i = index; i < member - 1; i++) {
                             registerState[i] = registerState[i+1];
                         }
@@ -63,7 +83,7 @@ public class MyBot extends TelegramLongPollingBot {
             }
 
             String text = "없는 명령어 입니다.";
-            switch (messageText) {
+            switch (TEXT) {
                 case "시간":
                 if(lucy.getDoPhone()) {
                     text = "아직 공부를 시작하지 않았습니다!";
@@ -82,7 +102,7 @@ public class MyBot extends TelegramLongPollingBot {
                 System.out.println("가입");
                 boolean duplicate = false;  //duplicate registeration check flag
                 for (int i = 0; i < idArray.length; i++) {
-                    if(idArray[i].equals(Long.toString(update.getMessage().getChatId()))) {
+                    if(idArray[i].equals(ID)) {
                         System.out.println("중복가입 오류");
                         text = "이미 가입되어 있습니다!";
                         duplicate = true;
@@ -95,7 +115,7 @@ public class MyBot extends TelegramLongPollingBot {
                     }
                     else {
                         text = "비밀번호를 입력해 주세요";
-                        registerState[member++] = Long.toString(update.getMessage().getChatId());
+                        registerState[member++] = ID;
                     }
                 }
                 break;
@@ -103,15 +123,7 @@ public class MyBot extends TelegramLongPollingBot {
                 default:
                     break;
             }
-            SendMessage message = new SendMessage() // Create a SendMessage object with mandatory fields
-                    .setChatId(update.getMessage().getChatId()).setText(text);
-            
-            try {
-                execute(message); // Call method to send the message
-            } catch (TelegramApiException e) {
-                e.printStackTrace();
-                System.out.println("TelegramApi Execute Exception");
-            }
+            privateSendMessage(text, ID);
         }
     }
     
@@ -123,6 +135,14 @@ public class MyBot extends TelegramLongPollingBot {
     @Override
     public String getBotToken() {
         return botToken;
+    }
+
+    public void messageExecute(SendMessage message) {
+        try {
+            execute(message);
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
     }
 
     public MyBot setBotUsername(String botUsername) {
@@ -145,19 +165,34 @@ public class MyBot extends TelegramLongPollingBot {
         return this;
     }
 
+    /**
+     * information.json이 저장되어 있는 경로를 설정
+     */
     public MyBot setInfoPath(String path) {
         this.path = path;
         return this;
     }
 
+    /**
+     * int len 만큼의 길이를 가진 id를 저장하는 배열을 초기화한다.
+     * @param len
+     */
     public void initIdArray(int len) {
         idArray = new String[len];
     }
 
+    /**
+     * 순차적으로 id를 저장할 수 있음.
+     * @param id
+     */
     public void setId(String id) {
         idArray[cnt++] = id;
     }
 
+    /**
+     * idArray에 저장되어 있는 모든 사용자에게 메시지를 전송
+     * @param text
+     */
     public void sendMessage(String text) {
         for (int i = 0; i < idArray.length; i++) {
             SendMessage message = new SendMessage()
@@ -172,6 +207,16 @@ public class MyBot extends TelegramLongPollingBot {
     }
 
     public void privateSendMessage(String text, long user) {
+        SendMessage message = new SendMessage()
+        .setChatId(user).setText(text);
+        try {
+            execute(message);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void privateSendMessage(String text, String user) {
         SendMessage message = new SendMessage()
         .setChatId(user).setText(text);
         try {

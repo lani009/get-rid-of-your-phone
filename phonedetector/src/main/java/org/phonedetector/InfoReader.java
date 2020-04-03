@@ -1,6 +1,5 @@
 package org.phonedetector;
 
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
@@ -20,9 +19,11 @@ public class InfoReader {
     private int cnt;
     private String password;
 
-    public InfoReader(String path) throws FileNotFoundException, IOException, ParseException {
+    public InfoReader(String path) throws IOException, ParseException {
         JSONParser parser = new JSONParser();
-        JSONObject jsonData = (JSONObject) parser.parse(new FileReader(path));
+        JSONObject jsonData;
+
+        jsonData = (JSONObject) parser.parse(new FileReader(path));
         this.idArray = (JSONArray) jsonData.get("user");
         this.apiToken = (String) jsonData.get("token");
         this.botName = (String) jsonData.get("botName");

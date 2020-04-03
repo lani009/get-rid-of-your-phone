@@ -2,6 +2,8 @@ package org.phonedetector;
 
 import java.util.Calendar;
 
+import org.phonedetector.exceptions.NoTodayJsonException;
+
 /**
  * Thread를 통해 오후 11시가 되면 하루 일과 총 정리를 보낸다.
  */
@@ -40,13 +42,13 @@ public class TodayResultAlert implements Runnable {
      */
     private void sleep(int milliSeconds) {
         try {
-            Thread.sleep(new Long(milliSeconds));
+            Thread.sleep(Long.valueOf(milliSeconds));
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
     }
 
-    private void alertSend() {
+    private int alertSend() {
         /*
         오늘의 종합 보고
         1. 제출시간: 09:23:42
@@ -59,7 +61,17 @@ public class TodayResultAlert implements Runnable {
         총 시간: 00시간 00분 00초
         */
         StringBuilder sb = new StringBuilder("오늘의 종합 보고\n");
-        ResultReader result = new ResultReader();
+        ResultReader result;
+        try {
+            result = new ResultReader();
+        } catch (NoTodayJsonException e) {
+            sb.append("오늘은 핸드폰을 제출하지 않았습니다.");
+            bot.sendMessage(sb.toString());
+            return -1;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return -1;
+        }
         int cnt = 0;
         long durationTotal = 0;
         long duration;
@@ -83,6 +95,7 @@ public class TodayResultAlert implements Runnable {
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
+        return 0;
         
     }
 }

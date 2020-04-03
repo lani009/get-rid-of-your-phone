@@ -1,10 +1,6 @@
 package org.phonedetector;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 
@@ -42,20 +38,13 @@ public class MessageSender {
         return this;
     }
 
+    @SuppressWarnings("unused")
     public void sendMessage(String text) throws IOException {
         for (int i = 0; i < idArray.length; i++) {
             URL url = new URL(String.format(urlString, apiToken, idArray[i], text));
             URLConnection conn = url.openConnection();
-    
-            StringBuilder sb = new StringBuilder();
-            InputStream is = new BufferedInputStream(conn.getInputStream());
-            BufferedReader br = new BufferedReader(new InputStreamReader(is));
-            String inputLine = "";
-            while ((inputLine = br.readLine()) != null) {
-                sb.append(inputLine);
-            }
-            String response = sb.toString();
-            System.out.print(response);
+
+            System.out.println(idArray[i] + "에게 전송: " + text);
         }
     }
 }

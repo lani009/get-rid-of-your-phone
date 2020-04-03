@@ -21,7 +21,7 @@ public class MyBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        // We check if the update has a message and the message has text
+        // check if the update has a message and the message has text
         if (update.hasMessage() && update.getMessage().hasText()) {
             String messageText = update.getMessage().getText();
 
@@ -109,7 +109,8 @@ public class MyBot extends TelegramLongPollingBot {
             try {
                 execute(message); // Call method to send the message
             } catch (TelegramApiException e) {
-                e.getMessage();
+                e.printStackTrace();
+                System.out.println("TelegramApi Execute Exception");
             }
         }
     }
@@ -165,7 +166,7 @@ public class MyBot extends TelegramLongPollingBot {
             try {
                 execute(message); // Call method to send the message
             } catch (TelegramApiException e) {
-                e.getMessage();
+                e.printStackTrace();
             }
         }
     }

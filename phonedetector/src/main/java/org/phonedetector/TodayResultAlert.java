@@ -45,6 +45,7 @@ public class TodayResultAlert implements Runnable {
             Thread.sleep(Long.valueOf(milliSeconds));
         } catch (Exception e) {
             System.out.println(e.getMessage());
+            e.printStackTrace();
         }
     }
 

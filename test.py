@@ -1,6 +1,5 @@
 import socket
 import time
-import keyboard as key
 
 
 
@@ -10,28 +9,8 @@ class enum:
 
 def main():
     socket = javaSocket()
-    btnDet = button()
-    btnDet.stateSender(socket)
-
-class button:
-    originTime = None
-    originState = None
-    isOrigin = True
-    originData = 1
-    alerted = False
-    def __init(self):
-        pass
-
-    def stateSender(self, s):
-        while True:
-            a = int(input())
-            s.sendState(a)
-
-    def isTimeover(self, originTime):
-        if(time.time() - originTime > 3.0):
-            return True
-        else:
-            return False
+    while True:
+        socket.sendState(int(input()))
 
 
 class javaSocket:

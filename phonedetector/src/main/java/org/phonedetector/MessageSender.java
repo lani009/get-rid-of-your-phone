@@ -38,12 +38,12 @@ public class MessageSender {
         return this;
     }
 
-    @SuppressWarnings("unused")
+    //@SuppressWarnings("unused")
     public void sendMessage(String text) throws IOException {
         for (int i = 0; i < idArray.length; i++) {
             URL url = new URL(String.format(urlString, apiToken, idArray[i], text));
             URLConnection conn = url.openConnection();
-
+            conn.getInputStream();
             System.out.println(idArray[i] + "에게 전송: " + text);
         }
     }

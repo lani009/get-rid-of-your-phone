@@ -49,6 +49,10 @@ public class TodayResultAlert implements Runnable {
         }
     }
 
+    /**
+     * 오늘의 총합 보고
+     * @return state
+     */
     private int alertSend() {
         /*
         오늘의 종합 보고
@@ -67,7 +71,7 @@ public class TodayResultAlert implements Runnable {
             result = new ResultReader();
         } catch (NoTodayJsonException e) {
             sb.append("오늘은 핸드폰을 제출하지 않았습니다.");
-            bot.sendMessage(sb.toString());
+            bot.sendMessageAll(sb.toString());
             return -1;
         } catch (Exception e) {
             e.printStackTrace();
@@ -92,7 +96,7 @@ public class TodayResultAlert implements Runnable {
         sb.append("오늘의 총 시간: ");
         sb.append(TimeCalculator.getMilliToFormatted(durationTotal));
         try {
-            bot.sendMessage(sb.toString());
+            bot.sendMessageAll(sb.toString());
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }

@@ -16,7 +16,6 @@ public class InfoReader {
     private JSONArray idArray;
     private String apiToken;
     private String botName;
-    private int cnt;
     private String password;
 
     public InfoReader(String path) throws IOException, ParseException {
@@ -29,11 +28,11 @@ public class InfoReader {
         this.botName = (String) jsonData.get("botName");
         this.password = (String) jsonData.get("password");
         this.length = idArray.size();
-        this.cnt = 0;
     }
 
     /**
      * returns the number of persons.
+     * @return length 길이
      */
     public int getLength() {
         return length;
@@ -51,33 +50,16 @@ public class InfoReader {
         return password;
     }
 
-    public String nextId() {
-        JSONObject data = (JSONObject) idArray.get(cnt++);
-        long id = (long) data.get("id");
-        String sId = Long.toString(id);
-        return sId;
-    }
-
-    /**
-     * clear the previuos nextId() iteration
-     */
-    public void clearIteration() {
-        cnt = 0;
-    }
-
     /**
      * returns the User Id in string array
      * @return String[] id
      */
     public String[] getId() {
-        int tempCnt = cnt;  //to memorize the previous cnt value
-        cnt = 0;
         String[] id = new String[length];
         for (int i = 0; i < length; i++) {
-            JSONObject data = (JSONObject) idArray.get(cnt++);
+            JSONObject data = (JSONObject) idArray.get(i);
             id[i] = Long.toString((long)data.get("id"));
         }
-        cnt = tempCnt;
         return id;
     }
 }

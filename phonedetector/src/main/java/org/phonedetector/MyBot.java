@@ -3,6 +3,7 @@ package org.phonedetector;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.phonedetector.interfaces.MessageSendable;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -11,12 +12,11 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 /**
  * Telegram으로 전송받은 User Command를 처리
  */
-public class MyBot extends TelegramLongPollingBot {
+public class MyBot extends TelegramLongPollingBot implements MessageSendable {
     private String botUsername;
     private String botToken;
     private Lucy lucy;
     private String idArray[];
-    private int cnt = 0;
     private String[] registerState = new String[10];
     private int member = 0;
     private String password = "null";
@@ -42,11 +42,11 @@ public class MyBot extends TelegramLongPollingBot {
             }
             if(behavior) {
                 System.out.println("가입되지 않은 사용자");
-                privateSendMessage("가입되지 않은 사용자로부터 메시지\n" + TEXT, idArray[0]);
+                sendMessage("가입되지 않은 사용자로부터 메시지\n" + TEXT, idArray[0]);
 
                 //가입하려는 목적이 아닐 경우
                 if(!TEXT.equals("가입")) {
-                    privateSendMessage("가입되지 않은 사용자 입니다.", ID);
+                    sendMessage("가입되지 않은 사용자 입니다.", ID);
                     return; //가입되지 않은 사용자 일경우 리턴
                 }
                 
@@ -72,7 +72,7 @@ public class MyBot extends TelegramLongPollingBot {
                         return;
                     }
                     else {
-                        privateSendMessage("비밀번호가 틀립니다.", ID);
+                        sendMessage("비밀번호가 틀립니다.", ID);
                         for (int i = index; i < member - 1; i++) {
                             registerState[i] = registerState[i+1];
                         }
@@ -123,7 +123,7 @@ public class MyBot extends TelegramLongPollingBot {
                 default:
                     break;
             }
-            privateSendMessage(text, ID);
+            sendMessage(text, ID);
         }
     }
     
@@ -173,27 +173,15 @@ public class MyBot extends TelegramLongPollingBot {
         return this;
     }
 
-    /**
-     * int len 만큼의 길이를 가진 id를 저장하는 배열을 초기화한다.
-     * @param len
-     */
-    public void initIdArray(int len) {
-        idArray = new String[len];
-    }
-
-    /**
-     * 순차적으로 id를 저장할 수 있음.
-     * @param id
-     */
-    public void setId(String id) {
-        idArray[cnt++] = id;
+    public void setIdArray(String[] idArray) {
+        this.idArray = idArray;
     }
 
     /**
      * idArray에 저장되어 있는 모든 사용자에게 메시지를 전송
      * @param text
      */
-    public void sendMessage(String text) {
+    public void sendMessageAll(String text) {
         for (int i = 0; i < idArray.length; i++) {
             SendMessage message = new SendMessage()
             .setChatId(idArray[i]).setText(text);
@@ -206,7 +194,7 @@ public class MyBot extends TelegramLongPollingBot {
         }
     }
 
-    public void privateSendMessage(String text, long user) {
+    public void sendMessage(String text, long user) {
         SendMessage message = new SendMessage()
         .setChatId(user).setText(text);
         try {
@@ -216,7 +204,7 @@ public class MyBot extends TelegramLongPollingBot {
         }
     }
 
-    public void privateSendMessage(String text, String user) {
+    public void sendMessage(String text, String user) {
         SendMessage message = new SendMessage()
         .setChatId(user).setText(text);
         try {

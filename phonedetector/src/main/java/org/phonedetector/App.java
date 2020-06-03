@@ -3,6 +3,7 @@ package org.phonedetector;
 import java.io.IOException;
 
 import org.json.simple.parser.ParseException;
+import org.phonedetector.interfaces.Socketable;
 import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -12,7 +13,7 @@ public class App {
         String informationPath = "./information.json";
         InfoReader infoReader = new InfoReader(informationPath);   //parse json information
         
-        RpiSocket rpiConn = new RpiSocket(8887);    //RPISocket init
+        Socketable rpiConn = new RpiSocket(8887);    //RPISocket init
         Lucy lucy = new Lucy();
         
         //telegram bot init
@@ -29,23 +30,18 @@ public class App {
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }
-        bot.initIdArray(infoReader.getLength());
-        
-        //id input
-        for (int i = 0; i < infoReader.getLength(); i++) {
-            String id = infoReader.nextId();
-            bot.setId(id);
-        }
+        bot.setIdArray(infoReader.getId());
 
         //messageSender init
-        MessageSender messageSender = new MessageSender()
-                        .setApiToken(infoReader.getApiToken())
-                        .setId(infoReader.getId());
+        MessageSender messageSender = new MessageSender();
+        messageSender.setApiToken(infoReader.getApiToken());
+        messageSender.addId(infoReader.getId());
         
         PhoneThread pt = new PhoneThread()
                             .setLucy(lucy)
                             .setMessageSender(messageSender)
                             .setSocket(rpiConn);
+                            
         Thread thread = new Thread(pt, "PhoneThread");
 
         TodayResultAlert todayResult = new TodayResultAlert()

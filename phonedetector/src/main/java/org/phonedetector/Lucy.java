@@ -28,14 +28,14 @@ public class Lucy {
 
     /**
      * 동생이 폰을 하고 있는지 안하고 있는지 체크
-     * 만약 폰을 제출 하지 않았다(폰을 하고 있다) -> return true
+     * 만약 폰을 제출 하지 않았다(폰을 하고 있다): return true
      * @return true if she hasen't returned her phone. As so reversal.
      */
     public boolean getDoPhone() {
         return doPhone;
     }
 
-    protected long getReturnTimeDelta() {
+    long getReturnTimeDelta() {
         return System.currentTimeMillis() - returnTime;
     }
 }

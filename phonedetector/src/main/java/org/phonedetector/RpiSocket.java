@@ -5,7 +5,10 @@ import java.io.InputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class RpiSocket {
+import org.phonedetector.exceptions.SocketClosedException;
+import org.phonedetector.interfaces.Socketable;
+
+public class RpiSocket implements Socketable {
     private ServerSocket s_socket;
     private Socket c_socket;
 
@@ -24,7 +27,7 @@ public class RpiSocket {
      * @return
      * @throws IOException
      */
-    public byte[] getData() throws IOException {
+    private byte[] getData() throws IOException {
         InputStream data = c_socket.getInputStream();
         byte[] receiveBuffer = new byte[10];
         data.read(receiveBuffer);
@@ -32,7 +35,30 @@ public class RpiSocket {
         return receiveBuffer;
     }
 
-    public int getIntData() throws IOException {
+    private int getIntData() throws IOException {
         return getData()[0];
+
+    }
+
+    /**
+     * 폰 제출의 상태 확인.
+     * false 일 경우 폰 제출 안함
+     * true 일 경우 폰 제출 함
+     */
+    @Override
+    public boolean getStatus() throws SocketClosedException {
+        int data = 0;
+        try {
+            data = getIntData();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        if(data == 1)
+            return false;
+        else if(data == 2)
+            return true;
+        else
+            throw new SocketClosedException("Socket Closed");
     }
 }

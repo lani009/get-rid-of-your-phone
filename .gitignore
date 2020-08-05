@@ -12,5 +12,5 @@ buildNumber.properties
 *.jar
 
 information.json
-
+dbPassword.txt
 .vscode

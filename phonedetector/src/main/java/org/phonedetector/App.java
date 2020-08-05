@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.json.simple.parser.ParseException;
 import org.phonedetector.interfaces.Socketable;
+import org.phonedetector.jdbc.InfoDAO;
 import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -14,38 +15,31 @@ public class App {
         InfoReader infoReader = new InfoReader(informationPath);   //parse json information
         
         Socketable rpiConn = new RpiSocket(8887);    //RPISocket init
-        Lucy lucy = new Lucy();
+        // MessageSender init
+        MessageSender.getInstance().setApiToken(infoReader.getApiToken());
+        MessageSender.getInstance().setUserTelegramId(InfoDAO.getInstance().getUserTelegramIdList());
         
         //telegram bot init
         ApiContextInitializer.init();
         TelegramBotsApi botsApi = new TelegramBotsApi();
-        MyBot bot = new MyBot()
-                    .setBotToken(infoReader.getApiToken())
-                    .setBotUsername(infoReader.getBotName())
-                    .setLucy(lucy)
-                    .setPassword(infoReader.getPassword())
-                    .setInfoPath(informationPath);
+        MyBot.getInstance()
+                .setBotToken(infoReader.getApiToken())
+                .setBotUsername(infoReader.getBotName());
         try {
-            botsApi.registerBot(bot);
+            botsApi.registerBot(MyBot.getInstance());
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }
-        bot.setIdArray(infoReader.getId());
-
-        //messageSender init
-        MessageSender messageSender = new MessageSender();
-        messageSender.setApiToken(infoReader.getApiToken());
-        messageSender.addId(infoReader.getId());
         
+        // 사용자에게 공부 상황을 전달하기 위해 시작
         PhoneThread pt = new PhoneThread()
-                            .setLucy(lucy)
-                            .setMessageSender(messageSender)
                             .setSocket(rpiConn);
                             
         Thread thread = new Thread(pt, "PhoneThread");
 
+        // 오늘의 공부 상황을 알리기 위해 실행
         TodayResultAlert todayResult = new TodayResultAlert()
-                        .setBot(bot);
+                        .setBot(MyBot.getInstance());
         Thread resultThread = new Thread(todayResult, "todayResultAlert");
         thread.start();
         resultThread.start();

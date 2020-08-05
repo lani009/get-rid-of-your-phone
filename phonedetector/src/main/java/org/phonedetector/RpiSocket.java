@@ -17,6 +17,16 @@ public class RpiSocket implements Socketable {
         System.out.println("Waiting for connection");
         c_socket = s_socket.accept();
         System.out.println("Socket Accepted!");
+        try {
+            Thread.sleep(5000); // 파이썬 서버로 부터의 첫번째 입력을 기다림
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        try {
+            System.out.println(getStatus());    // 첫번째 입력은 버림
+        } catch (SocketClosedException e) {
+            e.printStackTrace();
+        }
     }
 
     /**

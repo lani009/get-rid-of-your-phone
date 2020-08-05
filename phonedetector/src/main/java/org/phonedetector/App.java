@@ -43,5 +43,6 @@ public class App {
         Thread resultThread = new Thread(todayResult, "todayResultAlert");
         thread.start();
         resultThread.start();
+        System.out.println("\n\nTelegram Study Alert Ready!!\n");
     }
 }

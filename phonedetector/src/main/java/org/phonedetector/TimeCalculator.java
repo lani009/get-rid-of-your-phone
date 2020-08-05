@@ -30,7 +30,7 @@ public class TimeCalculator {
             return String.format("%02d 분, %02d 초",  Minutes, Seconds);
         }
         else {
-            return String.format("%02d 분", Seconds);
+            return String.format("%02d 초", Seconds);
         }
     }
 

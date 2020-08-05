@@ -84,11 +84,14 @@ public class InfoDAO {
      * 폰을 <strong>반납한</strong> 시간 등록
      */
     public void setReturnTime() {
-        try (PreparedStatement pstmt = conn.prepareStatement("INSERT INTO time_recorder VALUES (?, ?, ?)")) {
-            pstmt.setTime(1, new Time(System.currentTimeMillis())); // 반납한 시간
-            pstmt.setNull(2, Types.TIME);   // 다시 가져간 시간은 Null로 설정
-            pstmt.setDate(2, new java.sql.Date(System.currentTimeMillis()));    // 반납한 날짜
+        try (PreparedStatement pstmt = conn.prepareStatement("INSERT INTO time_recorder VALUES (?, ?, ?, ?)")) {
+            Time currentTime = new Time(System.currentTimeMillis());    // 현재 시간
+            pstmt.setNull(1, Types.BIGINT); // id 자리는 null로 설정
+            pstmt.setTime(2, currentTime); // 반납한 시간
+            pstmt.setNull(3, Types.TIME);   // 다시 가져간 시간은 Null로 설정
+            pstmt.setDate(4, new java.sql.Date(System.currentTimeMillis()));    // 반납한 날짜
             pstmt.executeUpdate();
+            this.returnedTime = currentTime;
         } catch (SQLException e) {
             e.printStackTrace();
         }

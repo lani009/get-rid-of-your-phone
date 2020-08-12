@@ -46,10 +46,27 @@ public class InfoDAO {
             br.close();
             
             Class.forName("org.mariadb.jdbc.Driver");   // 마리아 DB 적재
-            this.conn = DriverManager.getConnection("jdbc:mariadb://lanihome.iptime.org:3306/PhoneDetector", databaseID, databasePW);   // 커넥션 연결
+            this.conn = DriverManager.getConnection("jdbc:mariadb://lanihome.iptime.org:3306/PhoneDetector?autoReconnect=true", databaseID, databasePW);   // 커넥션 연결
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * 데이터베이스 커넥션을 제공.
+     */
+    public Connection getConnection() {
+        try {
+            if (conn.isValid(2)) {
+                return conn;
+            } else {
+                this.conn = DriverManager.getConnection("jdbc:mariadb://lanihome.iptime.org:3306/PhoneDetector?autoReconnect=true", databaseID, databasePW);   // 커넥션 연결
+                return conn;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**
@@ -57,7 +74,7 @@ public class InfoDAO {
      * @return User Telegram Id List
      */
     public List<String> getUserTelegramIdList() {
-        try (PreparedStatement pstmt = conn.prepareStatement("SELECT user_telegram_id FROM subscriber");
+        try (PreparedStatement pstmt = getConnection().prepareStatement("SELECT user_telegram_id FROM subscriber");
              ResultSet rs = pstmt.executeQuery();) {
 
             List<String> userIdList = new ArrayList<>();
@@ -84,7 +101,7 @@ public class InfoDAO {
      * 폰을 <strong>반납한</strong> 시간 등록
      */
     public void setReturnTime() {
-        try (PreparedStatement pstmt = conn.prepareStatement("INSERT INTO time_recorder VALUES (?, ?, ?, ?)")) {
+        try (PreparedStatement pstmt = getConnection().prepareStatement("INSERT INTO time_recorder VALUES (?, ?, ?, ?)")) {
             Time currentTime = new Time(System.currentTimeMillis());    // 현재 시간
             pstmt.setNull(1, Types.BIGINT); // id 자리는 null로 설정
             pstmt.setTime(2, currentTime); // 반납한 시간
@@ -102,7 +119,7 @@ public class InfoDAO {
      */
     public StudyTime setRetriveTime() {
         Time currentTime = new Time(System.currentTimeMillis());    // 현재 시간
-        try (PreparedStatement pstmt = conn.prepareStatement("UPDATE time_recorder SET retrieve_time = ? ORDER BY id DESC LIMIT 1")) {
+        try (PreparedStatement pstmt = getConnection().prepareStatement("UPDATE time_recorder SET retrieve_time = ? ORDER BY id DESC LIMIT 1")) {
             pstmt.setTime(1, currentTime); // 다시 가져간 시간
             pstmt.executeUpdate();
         } catch (SQLException e) {
@@ -122,7 +139,7 @@ public class InfoDAO {
         List<StudyTime> studyTimes = new ArrayList<>();
 
         // 오늘 날짜의 공부 시간만 선택
-        try (PreparedStatement pstmt = conn.prepareStatement("SELECT return_time, retrieve_time FROM time_recorder WHERE date=?")) {
+        try (PreparedStatement pstmt = getConnection().prepareStatement("SELECT return_time, retrieve_time FROM time_recorder WHERE date=?")) {
             pstmt.setDate(1, toDay);
             try (ResultSet rs = pstmt.executeQuery()) {
                 while(rs.next()) {
@@ -154,7 +171,7 @@ public class InfoDAO {
      */
     public List<String> getSuperUserList() {
         List<String> superUserList = new ArrayList<>();
-        try (PreparedStatement pstmt = conn.prepareStatement("SELECT user_telegram_id, is_super_user FROM subscriber")) {
+        try (PreparedStatement pstmt = getConnection().prepareStatement("SELECT user_telegram_id, is_super_user FROM subscriber")) {
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
                     if (rs.getBoolean("is_super_user")) {

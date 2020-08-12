@@ -44,7 +44,7 @@ public class MyBot extends TelegramLongPollingBot implements MessageSendable {
             sb.append(" - ");
             sb.append(date);
 
-            if (InfoDAO.getInstance().isRegistered(ID)) {
+            if (!InfoDAO.getInstance().isRegistered(ID)) {
                 // 가입되지 않은 사용자로 부터 온 메시지 처리
 
                 sendMessage("가입되지 않은 사용자로부터 메시지\n" + TEXT, InfoDAO.getInstance().getSuperUserList());

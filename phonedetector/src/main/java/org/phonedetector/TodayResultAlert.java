@@ -76,6 +76,7 @@ public class TodayResultAlert implements Runnable {
         } catch (NotExistTodayStudy e) {
             sb.append("오늘은 핸드폰을 제출하지 않았습니다.");
             bot.sendMessageAll(sb.toString());
+            return;
         }
         int cnt = 0;    // 순번
         long durationTotal = 0; // 총 제출 시간

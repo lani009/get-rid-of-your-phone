@@ -48,6 +48,8 @@ public class App {
         AlertInit.init(todayResult, new WeeklyResultAlert());
 
         System.out.println("\n\nTelegram Study Alert Ready!!\n");
+
+        System.out.println("Super User List\n" + InfoDAO.getInstance().getSuperUserList());
     }
 
 }

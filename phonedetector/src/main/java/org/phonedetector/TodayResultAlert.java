@@ -23,19 +23,25 @@ public class TodayResultAlert implements Runnable {
 
     @Override
     public void run() {
-        Calendar alertTime = Calendar.getInstance();
-        Calendar now = Calendar.getInstance();
-        alertTime.set(Calendar.HOUR, 23);
-        
+        boolean isFirst = true; // 처음 실행 여부
         while(true) {
-            now.setTimeInMillis(System.currentTimeMillis());
+            Calendar alertTime = Calendar.getInstance();
+            alertTime.set(Calendar.HOUR, 11);           // 11시
+            alertTime.set(Calendar.AM_PM, Calendar.PM); // 오후
 
-            if(now.get(Calendar.AM_PM) == 1 && now.get(Calendar.HOUR) >= alertTime.get(Calendar.HOUR)) {
-                System.out.println("Alert Sending!");
-                alertSend();
-                sleep(7200000);
+            if (alertTime.after(Calendar.getInstance()) && isFirst) {
+                // 알람 시간 후이고 처음 실행하는 경우
+                isFirst = false;
+            } else if (isFirst) {
+                // 알람 시간 전이지만 처음 실행인 경우
+                sleep(TimeCalculator.getTimeRemaining(alertTime));
+                isFirst = false;
+            } else {
+                // 처음 실행이 아닌 경우
+                alertTime.add(Calendar.DATE, 1);
+                sleep(TimeCalculator.getTimeRemaining(alertTime));
             }
-            sleep(3000);
+            alertSend();
         }
 
     }
@@ -44,9 +50,9 @@ public class TodayResultAlert implements Runnable {
      * Thread sleep
      * @param milliSeconds to be sleeped
      */
-    private void sleep(int milliSeconds) {
+    private void sleep(long milliSeconds) {
         try {
-            Thread.sleep(Long.valueOf(milliSeconds));
+            Thread.sleep(milliSeconds);
         } catch (Exception e) {
             System.out.println(e.getMessage());
             e.printStackTrace();

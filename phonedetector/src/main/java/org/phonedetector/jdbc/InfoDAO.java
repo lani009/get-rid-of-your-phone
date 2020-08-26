@@ -213,7 +213,7 @@ public class InfoDAO {
     public List<String> getSuperUserList() {
         List<String> superUserList = new ArrayList<>();
         try (PreparedStatement pstmt = getConnection()
-                .prepareStatement("SELECT user_telegram_idFROM subscriber WHERE is_super_user = ?")) {
+                .prepareStatement("SELECT user_telegram_id FROM subscriber WHERE is_super_user = ?")) {
             pstmt.setBoolean(1, true);
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {

@@ -29,7 +29,7 @@ public class TodayResultAlert implements Runnable {
             alertTime.set(Calendar.HOUR, 11);           // 11시
             alertTime.set(Calendar.AM_PM, Calendar.PM); // 오후
 
-            if (alertTime.after(Calendar.getInstance()) && isFirst) {
+            if (alertTime.before(Calendar.getInstance()) && isFirst) {
                 // 알람 시간 후이고 처음 실행하는 경우
                 isFirst = false;
             } else if (isFirst) {

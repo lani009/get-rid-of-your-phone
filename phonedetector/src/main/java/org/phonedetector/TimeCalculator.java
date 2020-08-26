@@ -18,19 +18,19 @@ public class TimeCalculator {
      * @return "%02d 시간, %02d 분, %02d 초" or "%02d 분, %02d 초"
      */
     public static String getMilliToFormatted(long milliSeconds) {
-        long Hours = TimeUnit.MILLISECONDS.toHours(milliSeconds);
+        long Days = TimeUnit.MILLISECONDS.toDays(milliSeconds);
+        long Hours = TimeUnit.MILLISECONDS.toHours(milliSeconds) - Days * 24;
         long Minutes = TimeUnit.MILLISECONDS.toMinutes(milliSeconds) - Hours * 60;
         long Seconds = TimeUnit.MILLISECONDS.toSeconds(milliSeconds) - 
         TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(milliSeconds));
 
-        if(Hours != 0) {
+        if (Days != 0) {
+            return String.format("%02d 일, %02d 시간, %02d 분, %02d 초", Days, Hours, Minutes, Seconds);
+        } else if (Hours != 0) {
             return String.format("%02d 시간, %02d 분, %02d 초", Hours, Minutes, Seconds);
-            
-        }
-        else if(Minutes != 0) {
+        } else if (Minutes != 0) {
             return String.format("%02d 분, %02d 초",  Minutes, Seconds);
-        }
-        else {
+        } else {
             return String.format("%02d 초", Seconds);
         }
     }

@@ -20,7 +20,7 @@ public class TimeCalculator {
     public static String getMilliToFormatted(long milliSeconds) {
         long Days = TimeUnit.MILLISECONDS.toDays(milliSeconds);
         long Hours = TimeUnit.MILLISECONDS.toHours(milliSeconds) - Days * 24;
-        long Minutes = TimeUnit.MILLISECONDS.toMinutes(milliSeconds) - Hours * 60;
+        long Minutes = TimeUnit.MILLISECONDS.toMinutes(milliSeconds) - Hours * 60 - Days * 60 * 24;
         long Seconds = TimeUnit.MILLISECONDS.toSeconds(milliSeconds) - 
         TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(milliSeconds));
 

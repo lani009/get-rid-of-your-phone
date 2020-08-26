@@ -11,11 +11,24 @@ import org.phonedetector.interfaces.Socketable;
 public class RpiSocket implements Socketable {
     private ServerSocket s_socket;
     private Socket c_socket;
+    private int port;
 
-    public RpiSocket(int port) throws IOException {
+    public RpiSocket(int port) {
+        this.port = port;
+    }
+
+    public void init() throws IOException {
         s_socket = new ServerSocket(port);
         System.out.println("Waiting for connection");
-        c_socket = s_socket.accept();
+
+        synchronized (this) {
+            notifyAll();
+        }
+        try {
+            c_socket = s_socket.accept();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         System.out.println("Socket Accepted!");
         try {
             Thread.sleep(5000); // 파이썬 서버로 부터의 첫번째 입력을 기다림
@@ -31,9 +44,11 @@ public class RpiSocket implements Socketable {
 
     /**
      * Get Data from Raspberry pi socket connection
-     * 1: phone is not in the PhoneCase
-     * 2: phone returned to the PhoneCase
-     * 0: connection closed
+     * <pre>
+     *1: phone is not in the PhoneCase
+     *2: phone returned to the PhoneCase
+     *0: connection closed
+     * </pre>
      * @return
      * @throws IOException
      */

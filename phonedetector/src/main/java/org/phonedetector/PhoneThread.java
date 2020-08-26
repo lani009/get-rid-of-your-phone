@@ -32,6 +32,7 @@ public class PhoneThread implements Runnable {
                 }
             } catch (SocketClosedException e) {
                 e.printStackTrace();
+                MessageSender.getInstance().sendMessage(e.toString(), InfoDAO.getInstance().getSuperUserList());
             }
         }
     }

@@ -1,6 +1,7 @@
 package org.phonedetector;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
@@ -42,5 +43,14 @@ public class TimeCalculator {
         Date date = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         return dateFormat.format(date);
+    }
+
+    /**
+     * 현재부터 특정 시간까지 남은 밀리세컨드를 리턴
+     * @param time 목표 날짜
+     * @return 남은 밀리세턴드 시간
+     */
+    public static long getTimeRemaining(Calendar time) {
+        return time.getTimeInMillis() - System.currentTimeMillis();
     }
 }

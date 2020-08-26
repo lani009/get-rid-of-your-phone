@@ -1,5 +1,6 @@
 package org.phonedetector;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -10,6 +11,7 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 
 /**
  * Telegram으로 전송받은 User Command를 처리
@@ -101,6 +103,31 @@ public class MyBot extends TelegramLongPollingBot implements MessageSendable {
      */
     private List<String> getUserTelegramIdList() {
         return InfoDAO.getInstance().getUserTelegramIdList();
+    }
+
+    /**
+     * 단일 사용자에게 이미지를 전송
+     * @param imgPath 이미지 경로
+     * @param user 유저 텔레그램 아이디
+     */
+    public void sendPhoto(String imgPath, String user) {
+        SendPhoto photo = new SendPhoto().setChatId(user).setPhoto(new File(imgPath));
+        try {
+            execute(photo);
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 단체 사용자에게 이미지를 전송
+     * @param imgPath 이미지 경로
+     * @param userList 단체 사용자
+     */
+    public void sendPhoto(String imgPath, List<String> userList) {
+        for (String user : userList) {
+            sendPhoto(imgPath, user);
+        }
     }
 
     /**

@@ -103,4 +103,9 @@ public class TodayResultAlert implements Runnable {
     private String timeToTimeString(Time time) {
         return time.toString();
     }
+
+    @Override
+    public String toString() {
+        return "Today Result Alert";
+    }
 }

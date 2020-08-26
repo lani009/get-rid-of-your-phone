@@ -2,20 +2,6 @@ package org.phonedetector;
 
 import java.io.IOException;
 
-import com.pi4j.io.gpio.GpioController;
-import com.pi4j.io.gpio.GpioFactory;
-import com.pi4j.io.gpio.GpioPinDigitalInput;
-import com.pi4j.io.gpio.GpioProvider;
-import com.pi4j.io.gpio.Pin;
-import com.pi4j.io.gpio.PinPullResistance;
-import com.pi4j.io.gpio.PinState;
-import com.pi4j.io.gpio.RaspiBcmPin;
-import com.pi4j.io.gpio.RaspiGpioProvider;
-import com.pi4j.io.gpio.RaspiPin;
-import com.pi4j.io.gpio.event.GpioPinListener;
-import com.pi4j.io.gpio.impl.PinImpl;
-import com.pi4j.wiringpi.Gpio;
-
 import org.json.simple.parser.ParseException;
 import org.phonedetector.interfaces.Socketable;
 import org.phonedetector.jdbc.InfoDAO;
@@ -55,12 +41,12 @@ public class App {
         PhoneThread pt = new PhoneThread().setSocket(rpiConn);
 
         Thread thread = new Thread(pt, "PhoneThread");
+        thread.start();
 
         // 오늘의 공부 상황을 알리기 위해 실행
         TodayResultAlert todayResult = new TodayResultAlert().setBot(MyBot.getInstance());
-        Thread resultThread = new Thread(todayResult, "todayResultAlert");
-        thread.start();
-        resultThread.start();
+        AlertInit.init(todayResult, new WeeklyResultAlert());
+
         System.out.println("\n\nTelegram Study Alert Ready!!\n");
     }
 

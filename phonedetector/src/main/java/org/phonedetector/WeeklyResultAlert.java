@@ -31,7 +31,7 @@ public class WeeklyResultAlert implements Runnable {
                 calendar.set(Calendar.MINUTE, 0);                       // 0분
                 calendar.set(Calendar.SECOND, 0);                       // 0초
                 calendar.set(Calendar.AM_PM, Calendar.PM);              // 오후
-                Thread.sleep(TimeCalculator.getTimeRemaining(calendar));// 까지 주무세요
+                sleep(TimeCalculator.getTimeRemaining(calendar));// 까지 주무세요
             } catch (InterruptedException e) {
                 e.printStackTrace();
                 MessageSender.getInstance().sendMessage(e.toString(), InfoDAO.getInstance().getSuperUserList());
@@ -66,6 +66,11 @@ public class WeeklyResultAlert implements Runnable {
             // 이미지 전송
             MyBot.getInstance().sendPhoto("./studyImg" + TimeCalculator.getTodayFormatted() + ".jpg", InfoDAO.getInstance().getUserTelegramIdList());
         }
+    }
+
+    private void sleep(long millis) throws InterruptedException {
+        System.out.println("WeeklyResultAlert Sleep Until: " + TimeCalculator.getMilliToFormatted(millis));
+        Thread.sleep(millis);
     }
     
 }

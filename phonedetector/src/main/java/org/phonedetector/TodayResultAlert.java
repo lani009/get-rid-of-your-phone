@@ -52,6 +52,7 @@ public class TodayResultAlert implements Runnable {
      */
     private void sleep(long milliSeconds) {
         try {
+            System.out.println("TodayResultAlert Sleep Until: " + TimeCalculator.getMilliToFormatted(milliSeconds));
             Thread.sleep(milliSeconds);
         } catch (Exception e) {
             System.out.println(e.getMessage());

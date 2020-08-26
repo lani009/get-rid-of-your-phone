@@ -116,6 +116,7 @@ public class MyBot extends TelegramLongPollingBot implements MessageSendable {
             execute(photo);
         } catch (TelegramApiException e) {
             e.printStackTrace();
+            sendMessage(e.toString(), InfoDAO.getInstance().getSuperUserList());
         }
     }
 

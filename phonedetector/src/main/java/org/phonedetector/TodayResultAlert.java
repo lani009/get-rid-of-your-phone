@@ -27,6 +27,8 @@ public class TodayResultAlert implements Runnable {
         while(true) {
             Calendar alertTime = Calendar.getInstance();
             alertTime.set(Calendar.HOUR, 11);           // 11시
+            alertTime.set(Calendar.MINUTE, 0);          // 0분
+            alertTime.set(Calendar.SECOND, 0);          // 0초
             alertTime.set(Calendar.AM_PM, Calendar.PM); // 오후
 
             if (alertTime.before(Calendar.getInstance()) && isFirst) {

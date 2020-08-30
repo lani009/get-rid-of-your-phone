@@ -14,7 +14,11 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
 
+import org.phonedetector.MessageSender;
 import org.phonedetector.exceptions.NotExistTodayStudy;
 import org.phonedetector.struct.StudyTime;
 
@@ -136,7 +140,7 @@ public class InfoDAO {
             return null;
         }
 
-        return new StudyTime(returnedTime, currentTime);
+        return new StudyTime(returnedTime, currentTime, null);
     }
 
     /**
@@ -159,13 +163,12 @@ public class InfoDAO {
     public List<StudyTime> getDateStudyTimes(Date date) {
         List<StudyTime> studyTimes = new ArrayList<>();
         try (PreparedStatement pstmt = getConnection().prepareStatement(
-                "SELECT return_time, retrieve_time FROM time_recorder WHERE date=? AND retrieve_time IS NOT NULL")) {
+                "SELECT return_time, retrieve_time, date FROM time_recorder WHERE date=? AND retrieve_time IS NOT NULL")) {
             pstmt.setDate(1, date);
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
-                    studyTimes.add(new StudyTime(rs.getTime("return_time"), rs.getTime("retrieve_time"))); // 공부 시간 리스트에
-                                                                                                           // 추가
-                }
+                    studyTimes.add(new StudyTime(rs.getTime("return_time"), rs.getTime("retrieve_time"), rs.getDate("date")));  // 공부 시간 리스트에
+                }                                                                                                               // 추가
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -174,21 +177,51 @@ public class InfoDAO {
     }
 
     /**
-     * 주간 공부량을 리턴
-     * @exception RuntimeException 본 메소드는 일요일에만 호출 가능함.
-     * @return 주간 공부량
+     * 특정 기간 동안의 공부량 리턴
+     * @param start 시작 날
+     * @param end 마지막 날
+     * @return 특정 기간 동안의 공부량
      */
-    public List<List<StudyTime>> getWeeklyStudyTimes() {
-        Calendar cal = Calendar.getInstance();
-        if (cal.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY) {
-            throw new RuntimeException("getWeeklyStudyTimes method can only be called on Sunday.");
+    public Map<Date, List<StudyTime>> getIntervalStudyTimes(Calendar start, Calendar end) {
+        System.out.printf("\n기간 공부량 호출\nstart: %s\nend: %s\n", start.getTime().toString(), end.getTime().toString());
+        Map<Date, List<StudyTime>> studyList = null;
+        List<StudyTime> resultList = new ArrayList<>();
+
+        try (PreparedStatement pstmt = getConnection().prepareStatement(
+            "SELECT return_time, retrieve_time, date FROM time_recorder"
+            + " WHERE time_recorder.date >= ? AND time_recorder.date <= ? AND retrieve_time IS NOT NULL"
+        )) {
+            pstmt.setDate(1, new Date(start.getTimeInMillis()));
+            pstmt.setDate(2, new Date(end.getTimeInMillis()));
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    resultList.add(new StudyTime(rs.getTime("return_time"), rs.getTime("retrieve_time"), rs.getDate("date")));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            MessageSender.getInstance().sendMessage(e.toString(), InfoDAO.getInstance().getSuperUserList());
         }
+        // resultList를 StudyTime::getDate 기준으로 그룹화
+        studyList = resultList.stream().collect(Collectors.groupingBy(StudyTime::getDate, TreeMap::new, Collectors.toList()));
 
-        // 무조건 일요일에만 호출가능하다는 가정 하에
-        List<List<StudyTime>> studyList = new ArrayList<>();
+        // 시작날과 끝날의 차이 계산
+        long diffDays = (end.getTimeInMillis() - start.getTimeInMillis()) / (1000 * 24 * 60 * 60);
+        Calendar temp = (Calendar) start.clone();   // 시간 Iterating 시작
 
-        for (int i = 7; i > 0; i--) {
-            studyList.add(getDateStudyTimes(new Date(System.currentTimeMillis() - 3600 * 24 * i * 1000)));
+        // 맵에 빈 날짜가 있는지 확인
+        for (int i = 0; i < diffDays + 1; i++) {
+            final Date FIXEDINDEX = new Date(temp.getTimeInMillis());
+            boolean anyMatch = studyList.keySet().stream().anyMatch(key -> {
+                // 날짜 단위만 비교하기 위해서 toString 사용
+                return key.toString().equals(FIXEDINDEX.toString());
+            });
+            if (!anyMatch) {
+                // FIXEDINDEX에 해당하는 날짜가 key에 없다.
+                studyList.put(FIXEDINDEX, null);
+            }
+            temp.add(Calendar.DATE, 1);
         }
 
         return studyList;

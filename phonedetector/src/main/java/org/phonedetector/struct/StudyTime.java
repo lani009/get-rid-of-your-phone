@@ -1,6 +1,7 @@
 package org.phonedetector.struct;
 
 import java.sql.Time;
+import java.sql.Date;
 
 public class StudyTime {
     /**
@@ -11,10 +12,15 @@ public class StudyTime {
      * 폰을 가져간 시각
      */
     private Time retriveTime = null;
+    /**
+     * 날짜
+     */
+    private Date date = null;
 
-    public StudyTime(Time returnTime, Time retriveTime) {
+    public StudyTime(Time returnTime, Time retriveTime, Date date) {
         this.returnTime = returnTime;
         this.retriveTime = retriveTime;
+        this.date = date;
     }
 
     /**
@@ -31,6 +37,14 @@ public class StudyTime {
      */
     public Time getRetriveTime() {
         return this.retriveTime;
+    }
+
+    /**
+     * 날짜 리턴
+     * @return 날짜
+     */
+    public Date getDate() {
+        return this.date;
     }
 
     /**

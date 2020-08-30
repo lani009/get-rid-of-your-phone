@@ -25,7 +25,7 @@ public class TodayResultAlert implements Runnable {
     public void run() {
         boolean isFirst = true; // 처음 실행 여부
         while(true) {
-            Calendar alertTime = Calendar.getInstance();
+            Calendar alertTime = Calendar.getInstance();// 오늘
             alertTime.set(Calendar.HOUR, 11);           // 11시
             alertTime.set(Calendar.MINUTE, 0);          // 0분
             alertTime.set(Calendar.SECOND, 0);          // 0초

@@ -1,6 +1,7 @@
 package org.phonedetector;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -62,12 +63,19 @@ public class MyBot extends TelegramLongPollingBot implements MessageSendable {
             String text = "없는 명령어 입니다.";
             switch (TEXT) {
                 case "시간":
-                if (!InfoDAO.getInstance().isReturnedPhone()) {
-                    text = "아직 공부를 시작하지 않았습니다!";
+                    if (!InfoDAO.getInstance().isReturnedPhone()) {
+                        text = "아직 공부를 시작하지 않았습니다!";
+                        break;
+                    } else {
+                        text = TimeCalculator.getMilliToFormatted(InfoDAO.getInstance().getCurrentTimeDelta());
+                    }
                     break;
-                } else {
-                    text = TimeCalculator.getMilliToFormatted(InfoDAO.getInstance().getCurrentTimeDelta());
-                }
+
+                case "주간 알림":
+                    AlertInit.weeklyAlertInterupt(ID);
+                    return;
+
+                case "일간 알림":
                     break;
 
                 default:
@@ -107,14 +115,17 @@ public class MyBot extends TelegramLongPollingBot implements MessageSendable {
 
     /**
      * 단일 사용자에게 이미지를 전송
-     * @param imgPath 이미지 경로
+     * @param imgPath 이미지 경로 (상대경로)
      * @param user 유저 텔레그램 아이디
      */
-    public void sendPhoto(String imgPath, String user) {
-        SendPhoto photo = new SendPhoto().setChatId(user).setPhoto(new File(imgPath));
+    public void sendPhoto(File imgPath, String user) {
         try {
+            SendPhoto photo = new SendPhoto().setChatId(user).setPhoto(imgPath.getCanonicalFile());
             execute(photo);
         } catch (TelegramApiException e) {
+            e.printStackTrace();
+            sendMessage(e.toString(), InfoDAO.getInstance().getSuperUserList());
+        } catch (IOException e) {
             e.printStackTrace();
             sendMessage(e.toString(), InfoDAO.getInstance().getSuperUserList());
         }
@@ -122,10 +133,10 @@ public class MyBot extends TelegramLongPollingBot implements MessageSendable {
 
     /**
      * 단체 사용자에게 이미지를 전송
-     * @param imgPath 이미지 경로
+     * @param imgPath 이미지 경로 (상대경로)
      * @param userList 단체 사용자
      */
-    public void sendPhoto(String imgPath, List<String> userList) {
+    public void sendPhoto(File imgPath, List<String> userList) {
         for (String user : userList) {
             sendPhoto(imgPath, user);
         }

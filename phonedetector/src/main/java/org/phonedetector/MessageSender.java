@@ -6,6 +6,7 @@ import java.net.URLConnection;
 import java.util.List;
 
 import org.phonedetector.interfaces.MessageSendable;
+import org.phonedetector.jdbc.InfoDAO;
 
 /**
  * Telegram으로 메시지를 전송하기 위한 클래스
@@ -18,7 +19,6 @@ import org.phonedetector.interfaces.MessageSendable;
 public class MessageSender implements MessageSendable {
     private String urlString = "https://api.telegram.org/bot%s/sendMessage?chat_id=%s&text=%s";
     private String apiToken;
-    private List<String> userTelegramId = null;
 
     private MessageSender() {
 
@@ -34,10 +34,6 @@ public class MessageSender implements MessageSendable {
 
     public void setApiToken(String apiToken) {
         this.apiToken = apiToken;
-    }
-
-    public void setUserTelegramId(List<String> userTelegramId) {
-        this.userTelegramId = userTelegramId;
     }
 
     private String toURLString(String apiToken, long id, String text) {
@@ -69,7 +65,7 @@ public class MessageSender implements MessageSendable {
      */
     @Override
     public void sendMessageAll(String text) {
-        for (String id : userTelegramId) {
+        for (String id : InfoDAO.getInstance().getUserTelegramIdList()) {
             sendMessage(text, id);
         }
     }

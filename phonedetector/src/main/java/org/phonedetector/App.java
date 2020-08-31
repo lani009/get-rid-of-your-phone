@@ -25,7 +25,6 @@ public class App {
 
         // MessageSender init
         MessageSender.getInstance().setApiToken(infoReader.getApiToken());
-        MessageSender.getInstance().setUserTelegramId(InfoDAO.getInstance().getUserTelegramIdList());
 
         // telegram bot init
         ApiContextInitializer.init();

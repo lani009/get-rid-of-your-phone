@@ -47,7 +47,7 @@ public class WeeklyResultAlert implements Runnable {
             }
 
             calendarStart = (Calendar) calendarEnd.clone();
-            calendarStart.add(Calendar.DATE, -6);   // 6일 전으로 초기화
+            calendarStart.add(Calendar.DATE, -7);   // 일주일 전으로 초기화
 
             // 차트 생성
             chart = new CategoryChartBuilder().height(800).width(600).title("주간 공부량").theme(ChartTheme.GGPlot2)

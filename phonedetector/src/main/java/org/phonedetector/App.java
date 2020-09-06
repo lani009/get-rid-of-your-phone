@@ -11,7 +11,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 public class App {
     public static void main(String[] args) throws IOException, ParseException {
-        String informationPath = "./information.json";
+        final String informationPath = "./information.json";
         InfoReader infoReader = new InfoReader(informationPath); // parse json information
 
         Socketable rpiConn = new RpiSocket(8887); // RPISocket init

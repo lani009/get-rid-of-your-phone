@@ -33,4 +33,12 @@ public class AlertInit {
             }
         }
     }
+
+    /**
+     * 일간 알리미 스레드 인터럽트
+     * @param id 실행한 유저의 id
+     */
+    public static void dailyAlertInterupt(String id) {
+        // TODO
+    }
 }

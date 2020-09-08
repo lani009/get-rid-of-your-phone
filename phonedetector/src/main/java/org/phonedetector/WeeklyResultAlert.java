@@ -23,7 +23,8 @@ import org.phonedetector.struct.StudyTime;
  * 주간 공부량을 알려준다. 일요일 오후 4시에 실행
  */
 public class WeeklyResultAlert implements Runnable {
-    final String[] DAYSTRINGS = new String[] { "일", "월", "화", "수", "목", "금", "토" };
+    private final String[] DAYSTRINGS = new String[] { "일", "월", "화", "수", "목", "금", "토" };
+    private boolean isInterruped = false;
     @Override
     public void run() {
         CategoryChart chart;
@@ -31,6 +32,7 @@ public class WeeklyResultAlert implements Runnable {
         Calendar calendarEnd = null;
         while (true) {
             try {
+                isInterruped = false;
                 calendarEnd = Calendar.getInstance();
                 calendarEnd.add(Calendar.DATE, 7);                         // 다음주
                 calendarEnd.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);    // 일요일
@@ -44,6 +46,7 @@ public class WeeklyResultAlert implements Runnable {
                 System.out.println("Weekly Result Alert 임의 실행");
                 calendarEnd = Calendar.getInstance();
                 calendarEnd.add(Calendar.DATE, -1);  // 캘린더 어제 날짜로 초기화
+                isInterruped = true;
             }
 
             calendarStart = (Calendar) calendarEnd.clone();
@@ -98,8 +101,12 @@ public class WeeklyResultAlert implements Runnable {
                 MessageSender.getInstance().sendMessage(e.toString(), InfoDAO.getInstance().getSuperUserList());
             }
 
-            // 이미지 전송
-            MyBot.getInstance().sendPhoto(new File("./studyImg/" + TimeCalculator.getTodayFormatted() + ".png"), InfoDAO.getInstance().getUserTelegramIdList());
+            if (isInterruped) {
+                MyBot.getInstance().sendPhoto(new File("./studyImg/" + TimeCalculator.getTodayFormatted() + ".png"), InterruptQueue.getInstance().poll().getId());
+            } else {
+                // 이미지 전송
+                MyBot.getInstance().sendPhoto(new File("./studyImg/" + TimeCalculator.getTodayFormatted() + ".png"), InfoDAO.getInstance().getUserTelegramIdList());
+            }
         }
     }
 

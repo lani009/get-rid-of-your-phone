@@ -3,6 +3,8 @@ package org.phonedetector;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.phonedetector.struct.Caller;
+
 /**
  * Thread를 사용하는 알리미들 초기화 + 인터럽트
  */
@@ -28,6 +30,7 @@ public class AlertInit {
     public static void weeklyAlertInterupt(String id) {
         for (Thread thread : threads) {
             if (thread.getName().equals("Weekly Result Alert")) {
+                InterruptQueue.getInstance().add(new Caller("Weekly Result Alert", id));
                 thread.interrupt();
                 return;
             }
